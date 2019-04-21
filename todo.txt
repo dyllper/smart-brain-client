@@ -1,0 +1,11 @@
+Allow detecting multiple faces per image.
+--display boxes around every present face, not just one.
+Increase "entries" value for each face detected in an image.
+Create a user profile page that shows name, email. and entry count.
+In user profile, create button to delete the account.
+Fix signin to display an error message when user enters bad credentials.
+Make signin errors more specific ('email not registered'/'incorrect password').
+Fix register to display an error message when something goes wrong.
+Make register errors more specific ('Email already in use').
+Add new functionality: change background gradient based on color pallete of image user submits (use Clarifai COLOR endpoint).
+Add tests (Jest or Cypress? Or both?).
