@@ -9,3 +9,6 @@ Fix register to display an error message when something goes wrong.
 Make register errors more specific ('Email already in use').
 Add new functionality: change background gradient based on color pallete of image user submits (use Clarifai COLOR endpoint).
 Add tests (Jest or Cypress? Or both?).
+Remove duplication of code from signin and register forms (create shared "Form" component?)
+Add better error handling around all API calls.
+Use React Router to handle routing rather than own custom routing.
