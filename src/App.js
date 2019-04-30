@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Particles from 'react-particles-js';
 import './App.css';
 import Navigation from './components/Navigation/Navigation';
@@ -8,6 +9,23 @@ import Rank from './components/Rank/Rank';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import Signin from './components/Signin/Signin';
 import Register from './components/Register/Register';
+
+import { setInputField, makeClarifaiCall } from './actions/images';
+
+const mapStateToProps = state => {
+   return {
+      input: state.input,
+      imageUrl: state.imageUrl,
+      box: state.boxData,
+   };
+};
+
+const mapDispatchToProps = dispatch => {
+   return {
+      onInputChange: event => dispatch(setInputField(event.target.value)),
+      onImageSubmit: () => dispatch(makeClarifaiCall(this.props.imageUrl)),
+   };
+};
 
 const particlesOptions = {
    particles: {
@@ -22,7 +40,6 @@ const particlesOptions = {
 };
 
 const initialState = {
-   input: '',
    imageUrl: '',
    box: {},
    route: 'signin',
@@ -54,61 +71,6 @@ class App extends Component {
       });
    };
 
-   calculateFaceLocation = data => {
-      //TODO: Update this to create boxes for ALL faces, not just one
-      const clarifaiBoundingBox =
-         data.outputs[0].data.regions[0].region_info.bounding_box;
-      const image = document.getElementById('inputImage');
-      const imageWidth = Number(image.width);
-      const imageHeight = Number(image.height);
-      return {
-         leftCol: clarifaiBoundingBox.left_col * imageWidth,
-         topRow: clarifaiBoundingBox.top_row * imageHeight,
-         rightCol: imageWidth - clarifaiBoundingBox.right_col * imageWidth,
-         bottomRow: imageHeight - clarifaiBoundingBox.bottom_row * imageHeight,
-      };
-   };
-
-   displayFaceBox = box => {
-      this.setState({ box: box });
-   };
-
-   onInputChange = event => {
-      this.setState({ input: event.target.value });
-   };
-
-   onImageSubmit = () => {
-      this.setState({ imageUrl: this.state.input });
-      fetch('https://shrouded-falls-91037.herokuapp.com/imageurl', {
-         method: 'post',
-         headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({
-            input: this.state.input,
-         }),
-      })
-         .then(response => response.json())
-         .then(response => {
-            if (response) {
-               fetch('https://shrouded-falls-91037.herokuapp.com/image', {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                     id: this.state.user.id,
-                  }),
-               })
-                  .then(response => response.json())
-                  .then(count => {
-                     this.setState(
-                        Object.assign(this.state.user, { entries: count })
-                     );
-                  })
-                  .catch(console.log);
-            }
-            this.displayFaceBox(this.calculateFaceLocation(response));
-         })
-         .catch(err => console.log(err));
-   };
-
    onRouteChange = route => {
       if (route === 'signout') {
          this.setState(initialState);
@@ -121,7 +83,8 @@ class App extends Component {
    };
 
    render() {
-      const { isSignedIn, imageUrl, route, box } = this.state;
+      const { onInputChange, onImageSubmit, box, imageUrl } = this.props;
+      const { isSignedIn, route } = this.state;
       return (
          <div className="App">
             <Particles className="particles" params={particlesOptions} />
@@ -137,8 +100,8 @@ class App extends Component {
                      entries={this.state.user.entries}
                   />
                   <ImageLinkForm
-                     onInputChange={this.onInputChange}
-                     onImageSubmit={this.onImageSubmit}
+                     onInputChange={onInputChange}
+                     onImageSubmit={onImageSubmit}
                   />
                   <FaceRecognition imageUrl={imageUrl} box={box} />
                </div>
@@ -158,4 +121,7 @@ class App extends Component {
    }
 }
 
-export default App;
+export default connect(
+   mapStateToProps,
+   mapDispatchToProps
+)(App);
