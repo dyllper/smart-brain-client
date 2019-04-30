@@ -1,6 +1,5 @@
 export const CHANGE_INPUT_FIELD = 'CHANGE_INPUT_FIELD';
 export const CHANGE_IMAGE_URL = 'CHANGE_IMAGE_URL';
-export const CLARIFAI_REQUEST_PENDING = 'CLARIFAI_REQUEST_PENDING';
 export const CHANGE_BOX_LOCATION_DATA = 'CHANGE_BOX_LOCATION_DATA';
 
 export const setInputField = text => ({
@@ -11,11 +10,6 @@ export const setInputField = text => ({
 export const setImageUrl = url => ({
    type: CHANGE_IMAGE_URL,
    url,
-});
-
-export const clarifaiRequestIsPending = isPending => ({
-   type: CLARIFAI_REQUEST_PENDING,
-   isPending,
 });
 
 export const setBoxValue = boxData => ({
@@ -32,10 +26,7 @@ export const makeClarifaiCall = imageUrl => dispatch => {
          input: imageUrl,
       }),
    })
-      .then(response => {
-         dispatch(clarifaiRequestIsPending(true));
-         return response.json();
-      })
+      .then(response => response.json())
       .then(
          response => {
             const box = calculateFacebox(response);
